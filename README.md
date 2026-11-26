@@ -71,6 +71,25 @@ npm run dev
 | 结论评审队列 | `conclusion_review` | 评审记录 | 记录编号、实验编码、评审结论 |
 | 指标查询服务 | `metric_api` | 查询接口 | 接口编码、指标编码、服务对象 |
 
+
+## 显著性检验检索与切片取证
+
+显著性检验页（`/significance_test`）与切片分析器页（`/segment_slice`）走独立的业务接口：
+
+- `GET /api/significance_test/search`：必须同时给 `experiment` 与 `metric`，按编码精确匹配；
+  `windows` 多选、`date_from`/`date_to` 按窗口起点与终点求相交；`sort` 支持窗口起点/终点、
+  批次、确认时间排序，排序键始终带批次轮次与 id 兜底，翻页不会换掉同一窗口的检验批次。
+- `GET /api/significance_test/queries/{signature}/rerun`：按当时的排序与筛选条件重查，
+  `added` 给出之后重检形成的可辨认新批次。
+- `POST /api/significance_test/{id}/revise`：更正已确认区间，原结果保留为“修订前”，
+  新轮次标记“修订后”，两者都可 `GET .../{id}/trace` 追查。
+- `POST /api/significance_test/{id}/revoke`：撤销已确认批次，撤销后不能再作为切片依据。
+- `POST /api/significance_test/evidence-tickets`：按勾选窗口登记取证单并锁定依据；
+  `.../{id}/claim` 领取时用 `basis=pinned|latest` 选择沿用登记时区间还是最新有效确认区间，
+  依据缺失或已撤销时返回具体缺依据的窗口。
+- `POST /api/segment_slice/{id}/run`：切片从检验批次领取依据，按实际确认区间与窗口范围计算，
+  结果记录检验批次与置信区间；区间跨零只记“无法判定差异方向”。
+
 ## 约定
 
 - 全部模块共享`frontend/src/views/WorkbenchView.vue|tsx`和一套资源路由。

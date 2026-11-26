@@ -32,7 +32,7 @@ class ReportGenService(BaseModuleService):
         exp_code = str(entry.get("实验编码", ""))
         significant = [
             r for r in store.rows("significance_test")
-            if r.get("实验编码") == exp_code and r.get("status") == "已检验"
+            if r.get("实验编码") == exp_code and r.get("status") == "已确认"
         ]
         attributed = [
             r for r in store.rows("attr_analysis")
@@ -69,7 +69,7 @@ class ReportGenService(BaseModuleService):
             return {"ok": False, "message": "仅生成失败报告可重试"}
         exp_code = str(entry.get("实验编码", ""))
         has_result = any(
-            r.get("实验编码") == exp_code and r.get("status") == "已检验"
+            r.get("实验编码") == exp_code and r.get("status") == "已确认"
             for r in store.rows("significance_test")
         )
         if not has_result:
@@ -120,7 +120,7 @@ class ReportGenService(BaseModuleService):
         exp_code = str(entry.get("实验编码", ""))
         sig_count = sum(
             1 for r in store.rows("significance_test")
-            if r.get("实验编码") == exp_code and r.get("status") == "已检验"
+            if r.get("实验编码") == exp_code and r.get("status") == "已确认"
         )
         attr_count = sum(
             1 for r in store.rows("attr_analysis")

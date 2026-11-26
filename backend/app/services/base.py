@@ -14,6 +14,8 @@ class BaseModuleService:
     STATUS_ORDER: list[str] = []
     ACTION_RULES: dict[str, str] = {}
     NEGATIVE_ACTIONS: list[str] = []
+    # 编码类字段必须精确匹配：E1 不能把 E10 带出来，同名指标也不能互相串组。
+    EXACT_FILTER_FIELDS: list[str] = []
 
     def list_entries(
         self,
@@ -26,7 +28,12 @@ class BaseModuleService:
     ) -> tuple[list[dict[str, Any]], int]:
         rows = list(store.rows(self.MODULE))
         for field, expected in (filters or {}).items():
-            if field in self.LIST_FIELDS:
+            if field in self.EXACT_FILTER_FIELDS:
+                rows = [
+                    row for row in rows
+                    if str(row.get(field, "")).casefold() == expected.casefold()
+                ]
+            elif field in self.LIST_FIELDS:
                 rows = [
                     row for row in rows
                     if expected.casefold() in str(row.get(field, "")).casefold()

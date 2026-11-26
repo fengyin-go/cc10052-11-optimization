@@ -79,7 +79,7 @@ class AttrAnalysisService(BaseModuleService):
         """读取显著性检验层的显著结果，确定可归因因子清单。"""
         factors = []
         for r in store.rows("significance_test"):
-            if r.get("实验编码") != exp_code or r.get("status") != "已检验":
+            if r.get("实验编码") != exp_code or r.get("status") != "已确认":
                 continue
             try:
                 if float(r.get("P值", "1.0")) < 0.05:
